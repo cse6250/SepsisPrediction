@@ -2,3 +2,7 @@
 !/.gitignore
 pivoted_sofa.csv
 training/
+bigdata/target/
+bigdata/project/*
+!bigdata/project/build.properties
+!bigdata/project/plugins.sbt
