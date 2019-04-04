@@ -1,6 +1,7 @@
 package edu.gatech.cse6250.main
 
 import edu.gatech.cse6250.helper.SparkHelper
+import edu.gatech.cse6250.model.Record
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
@@ -16,7 +17,7 @@ object Main {
     val spark = SparkHelper.spark
     val sc = spark.sparkContext
 
-    loadRawData(spark)
+    val result = loadRawData(spark)
 
   }
 
@@ -24,7 +25,15 @@ object Main {
     import spark.implicits._
     val sqlContext = spark.sqlContext
 
-    val patientRecord = spark.read.format("csv").option("header", true).option("sep", "|").load("../training/p00001.psv")
-    patientRecord.collect.foreach(println)
+    val df = spark.read.format("csv").option("header", true).option("sep", "|").load("../training/p000*.psv")
+    df.createOrReplaceTempView("patient_records")
+
+    val tmp = sqlContext.sql("SELECT HR, O2Sat, Temp, SBP, MAP, DBP, Resp, Age, Gender FROM patient_records")
+      .map(x => Record(x(0).toString.toDouble, x(1).toString.toDouble, x(2).toString.toDouble, x(3).toString.toDouble, x(4).toString.toDouble, x(5).toString.toDouble, x(6).toString.toDouble, x(7).toString.toInt, x(8).toString.toInt)).rdd
+
+    val classifier = tmp.map(x => (x.age, x.gender)).distinct()
+    classifier.collect.foreach(println)
+
+    tmp
   }
 }
