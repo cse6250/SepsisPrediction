@@ -1,2 +1,3 @@
 .DB_Store
-data/
+data/sepsis/
+data/mimic/pivoted_sofa.csv

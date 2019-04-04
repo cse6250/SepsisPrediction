@@ -8,7 +8,7 @@ import torch.optim as optim
 
 from utils import train, evaluate
 from plots import plot_learning_curves, plot_confusion_matrix
-from mydatasets import calculate_num_features, VisitSequenceWithLabelDataset, visit_collate_fn
+from mydatasets import calculate_num_features, VisitSequenceWithLabelDataset, time_collate_fn
 from mymodels import MyLSTM
 
 torch.manual_seed(0)
@@ -41,12 +41,12 @@ train_dataset = VisitSequenceWithLabelDataset(train_seqs, train_labels)
 valid_dataset = VisitSequenceWithLabelDataset(valid_seqs, valid_labels)
 test_dataset = VisitSequenceWithLabelDataset(test_seqs, test_labels)
 
-train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=visit_collate_fn,
+train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=time_collate_fn,
                           num_workers=NUM_WORKERS)
-valid_loader = DataLoader(dataset=valid_dataset, batch_size=BATCH_SIZE, shuffle=False, collate_fn=visit_collate_fn,
+valid_loader = DataLoader(dataset=valid_dataset, batch_size=BATCH_SIZE, shuffle=False, collate_fn=time_collate_fn,
                           num_workers=NUM_WORKERS)
 
-test_loader = DataLoader(dataset=test_dataset, batch_size=1, shuffle=False, collate_fn=visit_collate_fn,
+test_loader = DataLoader(dataset=test_dataset, batch_size=1, shuffle=False, collate_fn=time_collate_fn,
                          num_workers=NUM_WORKERS)
 
 model = MyLSTM(num_features)

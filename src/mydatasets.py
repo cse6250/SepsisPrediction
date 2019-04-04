@@ -31,23 +31,23 @@ class VisitSequenceWithLabelDataset(Dataset):
         return self.seqs[index], self.labels[index]
 
 
-def visit_collate_fn(batch):
+def time_collate_fn(batch):
     """
     DataLoaderIter call - self.collate_fn([self.dataset[i] for i in indices])
     Thus, 'batch' is a list [(seq1, label1), (seq2, label2), ... , (seqN, labelN)]
-    where N is minibatch size, seq is a (Sparse)FloatTensor, and label is a LongTensor
+    where N is minibatch size, seq is a FloatTensor, and label is a LongTensor
     
     :returns
         seqs (FloatTensor) - 3D of batch_size X max_length X num_features
         lengths (LongTensor) - 1D of batch_size
         labels (LongTensor) - 1D of batch_size
     """
-    print(batch[0])
     batch_seq, batch_label = zip(*batch)
 
     num_features = batch_seq[0].shape[1]
     seq_lengths = list(map(lambda patient_tensor: patient_tensor.shape[0], batch_seq))
     max_length = max(seq_lengths)
+
 
     sorted_indices, sorted_lengths = zip(*sorted(enumerate(seq_lengths), key=lambda x: x[1], reverse=True))
     sorted_padded_seqs = []
@@ -57,10 +57,10 @@ def visit_collate_fn(batch):
         length = batch_seq[i].shape[0]
 
         if length < max_length:
-            padded_patient = np.concatenate((batch_seq[i].toarray(),
+            padded_patient = np.concatenate((batch_seq[i].tolist(),
                                      np.zeros((max_length - length, num_features))), axis=0)
         else:
-            padded_patient = batch_seq[i].toarray()
+            padded_patient = batch_seq[i].tolist()
 
         sorted_padded_seqs.append(padded_patient)
         sorted_labels.append(batch_label[i])

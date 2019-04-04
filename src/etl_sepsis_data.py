@@ -29,8 +29,14 @@ def create_dataset(path, time_step=3):
                 break
             record_seqs.append(data.iloc[i:i+time_step].mean(0).tolist())
             target_seqs.append(target.iloc[i:i+time_step].max(0))
-        seqs.append(record_seqs)
-        labels.append(target_seqs)
+        if len(record_seqs) == 0:
+            pass
+        else:
+            seqs.append(record_seqs)
+        if len(target_seqs) == 0:
+            pass
+        else:
+            labels.append(max(target_seqs))
 
     return seqs, labels
 
