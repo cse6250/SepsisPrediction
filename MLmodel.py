@@ -200,13 +200,13 @@ def get_time_data():
     return trainX_mean_replace_time, predX_mean_replace_time, trainY_mean_replace_time, predY_mean_replace_time
         
 #===========main==============
-#print("----------original----------")
-#X_train, X_test, y_train, y_test = train_test_split(allX, allY, test_size=0.5, random_state=42)
-#MLtraining(X_train, X_test, y_train, y_test)
-#
-#print("----------replace with mean----------")
-#X_train, X_test, y_train, y_test = train_test_split(allX_mean_replace, allY_mean_replace, test_size=0.5, random_state=42)
-#MLtraining(X_train, X_test, y_train, y_test)
+print("----------original----------")
+X_train, X_test, y_train, y_test = train_test_split(allX, allY, test_size=0.5, random_state=42)
+MLtraining(X_train, X_test, y_train, y_test)
+
+print("----------replace with mean----------")
+X_train, X_test, y_train, y_test = train_test_split(allX_mean_replace, allY_mean_replace, test_size=0.5, random_state=42)
+MLtraining(X_train, X_test, y_train, y_test)
 
 print("----------4 hours prediction----------")
 trainX_mean_replace_time, predX_mean_replace_time, trainY_mean_replace_time, predY_mean_replace_time = get_time_data()
