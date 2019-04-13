@@ -35,5 +35,4 @@ def write_csv(sepsis_onset_time):
 
 if __name__ == '__main__':
     onset_time = read_csv()
-    # print(onset_time)
     write_csv(onset_time)
