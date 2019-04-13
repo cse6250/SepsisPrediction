@@ -95,9 +95,9 @@ def getSample():
     icustay_id_sepsis_set = set(sepsis_onset.icustay_id.astype(int).unique())
     # print(icustay_id_sepsis_set)
     icustay_id_non_sepsis_set = icustay_id_set - icustay_id_sepsis_set
-    sepsis_id = list(random.sample(icustay_id_sepsis_set, 1000))
-    non_sepsis_id = list(random.sample(icustay_id_non_sepsis_set, 1000))
-    return (sepsis_id[:800]+non_sepsis_id[:800], sepsis_id[800:900]+non_sepsis_id[800:900], sepsis_id[900:]+non_sepsis_id[900:])
+    sepsis_id = list(random.sample(icustay_id_sepsis_set, 500))
+    non_sepsis_id = list(random.sample(icustay_id_non_sepsis_set, 5000))
+    return (sepsis_id[:400]+non_sepsis_id[:4000], sepsis_id[400:450]+non_sepsis_id[4000:4500], sepsis_id[450:]+non_sepsis_id[4500:])
 
 if __name__ == '__main__':
     cleaned_pivoted_vital = cleanVitalData()
