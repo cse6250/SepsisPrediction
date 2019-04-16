@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import csv
 from datetime import datetime
+import numpy as np
 
 import random
 
@@ -36,8 +37,10 @@ def getSepsisLabel(row, onset_time):
     if target_id in onset_time:
         onset = datetime.strptime(onset_time[target_id], '%Y-%m-%d %H:%M:%S')
         # print(row['record_time'], onset_time[int(row['icustay_id'])])
-        if current_time > onset:
+        if current_time == onset:
             sepsis_label = 1
+        elif current_time > onset:
+            sepsis_label = np.nan
     return sepsis_label
 
 def cleanVitalData():
@@ -65,9 +68,11 @@ def concatPersonalInfo(cleaned_pivoted_vital):
     onset_time = getOnsetTime()
     final_df['sepsis_label'] = final_df.apply(getSepsisLabel, args=(onset_time,), axis=1)
     # print(final_df)
+    final_df.dropna(inplace=True)
+    final_df['sepsis_label'] = final_df['sepsis_label'].astype(int)
 
     ####### sample_process
-    train_id, valid_id, test_id = getSample()
+    train_id, valid_id, test_id = getSample(1000, 1000)
     
     train_df = final_df.loc[final_df['icustay_id'].isin(train_id)]
     train_df.to_csv('train_sample_cleaned_pivoted_vital.csv', index=False)
@@ -86,7 +91,7 @@ def getOnsetTime():
             onset_time[row['icustay_id']] = row['onset_time']
     return onset_time
 
-def getSample():
+def getSample(sepsis_icuid_size, nonsepsis_icuid_size):
     vital_df = pd.read_csv('pivoted_vital.csv')
     icustay_id_collection = vital_df.icustay_id.dropna().astype(int).unique()
     icustay_id_set = set(icustay_id_collection)
@@ -95,11 +100,17 @@ def getSample():
     icustay_id_sepsis_set = set(sepsis_onset.icustay_id.astype(int).unique())
     # print(icustay_id_sepsis_set)
     icustay_id_non_sepsis_set = icustay_id_set - icustay_id_sepsis_set
-    sepsis_id = list(random.sample(icustay_id_sepsis_set, 500))
-    non_sepsis_id = list(random.sample(icustay_id_non_sepsis_set, 5000))
-    return (sepsis_id[:400]+non_sepsis_id[:4000], sepsis_id[400:450]+non_sepsis_id[4000:4500], sepsis_id[450:]+non_sepsis_id[4500:])
+
+    sepsis_id = list(random.sample(icustay_id_sepsis_set, sepsis_icuid_size))
+    non_sepsis_id = list(random.sample(icustay_id_non_sepsis_set, nonsepsis_icuid_size))
+
+    sepsis_first_cut = int(sepsis_icuid_size*0.8)
+    sepsis_second_cut = int(sepsis_icuid_size*0.9)
+    nonsepsis_first_cut = int(nonsepsis_icuid_size*0.8)
+    nonsepsis_second_cut = int(nonsepsis_icuid_size*0.9)
+
+    return (sepsis_id[:sepsis_first_cut]+non_sepsis_id[:nonsepsis_first_cut], sepsis_id[sepsis_first_cut:sepsis_second_cut]+non_sepsis_id[nonsepsis_first_cut:nonsepsis_second_cut], sepsis_id[sepsis_second_cut:]+non_sepsis_id[nonsepsis_second_cut:])
 
 if __name__ == '__main__':
     cleaned_pivoted_vital = cleanVitalData()
     concatPersonalInfo(cleaned_pivoted_vital)
-    # train_id, valid_id, test_id = getSample()
