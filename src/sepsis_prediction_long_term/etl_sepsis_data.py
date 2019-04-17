@@ -8,7 +8,7 @@ PATH_TEST = "./../../data/sepsis/test/test_sample_cleaned_pivoted_vital.csv"
 PATH_OUTPUT = "./../../data/sepsis/processed_long_term/"
 
 
-def create_dataset(path, time_step=3):
+def create_dataset(path, time_step=1):
     """
     :param path: path to the directory contains raw files.
     :param timestep: time step for the sample
@@ -23,14 +23,23 @@ def create_dataset(path, time_step=3):
         label = group.iloc[:, -1]
         record_seqs = []
         label_seqs = []
-        for i in range(0, data.shape[0], time_step):
-            if i + time_step > data.shape[0]:
-                break
-            record_seqs.append(data.iloc[i:i+time_step].mean(0).tolist())
-            label_seqs.append(label.iloc[i:i+time_step].max(0))
-        
-        seqs.append(record_seqs)
-        labels.append(max(label_seqs))
+        # for i in range(0, data.shape[0], time_step):
+        #     if i + time_step > data.shape[0]:
+        #         break
+        #     record_seqs.append(data.iloc[i:i+time_step].mean(0).tolist())
+        #     label_seqs.append(label.iloc[i:i+time_step].max(0))
+
+        # if len(record_seqs) != 0:
+        #     seqs.append(record_seqs)
+        #     labels.append(max(label_seqs))
+        for i in range(0, data.shape[0] - time_step, 1):
+            record_seqs.append(data.iloc[i].tolist())
+
+        for j in range(data.shape[0] - time_step, data.shape[0], 1):
+            label_seqs.append(label.iloc[j])
+        if len(record_seqs) != 0:
+            seqs.append(record_seqs)
+            labels.append(max(label_seqs))
 
     return seqs, labels
 
