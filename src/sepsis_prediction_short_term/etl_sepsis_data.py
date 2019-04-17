@@ -8,7 +8,7 @@ PATH_TEST = "./../../data/sepsis/test/test_sample_cleaned_pivoted_vital.csv"
 PATH_OUTPUT = "./../../data/sepsis/processed_short_term/"
 
 
-def create_dataset(path, time_step=4):
+def create_dataset(path, time_step=24):
     """
     :param path: path to the directory contains raw files.
     :param timestep: time step for the sample
