@@ -66,9 +66,16 @@ def concatPersonalInfo(cleaned_pivoted_vital):
     final_df.dropna(inplace=True)
     final_df['sepsis_label'] = final_df['sepsis_label'].astype(int)
 
+    final_df['count'] = final_df.groupby('icustay_id')['icustay_id'].transform('count')
+    statistics = final_df[['icustay_id', 'count']].drop_duplicates()
+    statistics['sepsis'] = statistics.apply(lambda row: str(int(row['icustay_id'])) in onset_time, axis=1)
+    print(statistics)
+    statistics.to_csv('data_distribution.csv', index=False)
+
     ####### sample_process
     icu_size = final_df['icustay_id'].nunique()
     icu_with_sepsis_size = len(onset_time)
+    print(icu_size, icu_with_sepsis_size)
     train_id, valid_id, test_id = getSample(1000, 1000)
     
     train_df = final_df.loc[final_df['icustay_id'].isin(train_id)]
