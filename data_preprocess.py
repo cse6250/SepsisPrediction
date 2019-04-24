@@ -36,7 +36,6 @@ def getSepsisLabel(row, onset_time):
     target_id = str(int(row['icustay_id']))
     if target_id in onset_time:
         onset = datetime.strptime(onset_time[target_id], '%Y-%m-%d %H:%M:%S')
-        # print(row['record_time'], onset_time[int(row['icustay_id'])])
         if current_time == onset:
             sepsis_label = 1
         elif current_time > onset:
@@ -50,9 +49,6 @@ def cleanVitalData():
     filled_vital = vital_df.groupby(by='icustay_id').ffill().groupby(by='icustay_id').bfill()
     filled_vital.dropna(inplace=True)
 
-    # onset_time = getOnsetTime()
-    # filled_vital['sepsis_label'] = filled_vital.apply(getSepsisLabel, args=(onset_time,), axis=1)
-    # filled_vital.to_csv('cleaned_pivoted_vital.csv', index=False)
     return filled_vital
 
 def concatPersonalInfo(cleaned_pivoted_vital):
@@ -67,11 +63,12 @@ def concatPersonalInfo(cleaned_pivoted_vital):
 
     onset_time = getOnsetTime()
     final_df['sepsis_label'] = final_df.apply(getSepsisLabel, args=(onset_time,), axis=1)
-    # print(final_df)
     final_df.dropna(inplace=True)
     final_df['sepsis_label'] = final_df['sepsis_label'].astype(int)
 
     ####### sample_process
+    icu_size = final_df['icustay_id'].nunique()
+    icu_with_sepsis_size = len(onset_time)
     train_id, valid_id, test_id = getSample(1000, 1000)
     
     train_df = final_df.loc[final_df['icustay_id'].isin(train_id)]
@@ -95,10 +92,8 @@ def getSample(sepsis_icuid_size, nonsepsis_icuid_size):
     vital_df = pd.read_csv('pivoted_vital.csv')
     icustay_id_collection = vital_df.icustay_id.dropna().astype(int).unique()
     icustay_id_set = set(icustay_id_collection)
-    # print(icustay_id_set)
     sepsis_onset = pd.read_csv('sepsis_onset_time.csv')
     icustay_id_sepsis_set = set(sepsis_onset.icustay_id.astype(int).unique())
-    # print(icustay_id_sepsis_set)
     icustay_id_non_sepsis_set = icustay_id_set - icustay_id_sepsis_set
 
     sepsis_id = list(random.sample(icustay_id_sepsis_set, sepsis_icuid_size))
