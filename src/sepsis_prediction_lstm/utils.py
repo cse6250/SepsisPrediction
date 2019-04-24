@@ -3,7 +3,6 @@ import time
 import numpy as np
 import torch
 
-
 class AverageMeter(object):
     """Computes and stores the average and current value"""
 
@@ -21,7 +20,6 @@ class AverageMeter(object):
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
-
 
 def compute_batch_accuracy(output, target):
     """Computes the accuracy for a batch"""

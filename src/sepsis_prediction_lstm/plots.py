@@ -13,7 +13,7 @@ def plot_learning_curves(train_losses, valid_losses, train_accuracies, valid_acc
     plt.xlabel('epoch')
     plt.ylabel('Loss')
     plt.legend(loc='best')
-    fig1.savefig('./../../out/img/sepsis_prediction_short_term_loss_curve')
+    fig1.savefig('./../../out/img/sepsis_prediction_lstm_loss_curve')
 
     fig2 = plt.figure(2)
     plt.plot(np.arange(len(train_accuracies)), train_accuracies, label='Training Accuracy')
@@ -22,7 +22,7 @@ def plot_learning_curves(train_losses, valid_losses, train_accuracies, valid_acc
     plt.xlabel('epoch')
     plt.ylabel('Accuracy')
     plt.legend(loc='best')
-    fig2.savefig('./../../out/img/sepsis_prediction_short_term_accuracy_curve')
+    fig2.savefig('./../../out/img/sepsis_prediction_lstm_accuracy_curve')
 
 
 def plot_confusion_matrix(results, class_names):
@@ -48,4 +48,4 @@ def plot_confusion_matrix(results, class_names):
                     ha="center", va="center",
                     color="white" if cm[i, j] > thresh else "black")
     fig.tight_layout()
-    fig.savefig('./../../out/img/sepsis_prediction_short_term_confusion_matrix')
+    fig.savefig('./../../out/img/sepsis_prediction_lstm_confusion_matrix')

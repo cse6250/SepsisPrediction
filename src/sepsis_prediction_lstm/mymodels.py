@@ -5,9 +5,11 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 class MyLSTM(nn.Module):
     def __init__(self, dim_input):
         super(MyLSTM, self).__init__()
-        self.embedding = nn.Linear(in_features=dim_input, out_features=16)
-        self.rnn = nn.LSTM(input_size=16, hidden_size=8, batch_first=True)
-        self.output = nn.Linear(in_features=8, out_features=2)
+        self.embedding = nn.Linear(in_features=dim_input, out_features=8)
+        nn.init.xavier_normal_(self.embedding.weight)
+        self.rnn = nn.LSTM(input_size=8, hidden_size=4, num_layers=2, batch_first=True, dropout=0.5)
+        self.output = nn.Linear(in_features=4, out_features=2)
+        nn.init.xavier_normal_(self.output.weight)
     
     def forward(self, input_tuple):
         seqs, lengths = input_tuple
