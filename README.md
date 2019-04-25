@@ -1,7 +1,7 @@
 # SepsisPrediction
 This is the final project of the CSE6250. We mainly use the MIMIC-III data to predict the sepsis.
 
-ML model:
+## ML model:
 Please put the data at the same level with data/
 
 Currently, the arguments are fixed as:
