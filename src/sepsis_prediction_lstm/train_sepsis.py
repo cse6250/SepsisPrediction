@@ -4,26 +4,26 @@ import pickle
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from torch.utils.data.sampler import WeightedRandomSampler
 import torch.optim as optim
 
-from utils import train, evaluate
-from plots import plot_learning_curves, plot_confusion_matrix
+from utils import train, evaluate, best_evaluate
 from mydatasets import calculate_num_features, VisitSequenceWithLabelDataset, time_collate_fn
 from mymodels import MyLSTM
 
 torch.manual_seed(0)
 
-PATH_TRAIN_SEQS = "./../../data/sepsis/processed_long_term/sepsis.seqs.train"
-PATH_TRAIN_LABELS = "./../../data/sepsis/processed_long_term/sepsis.labels.train"
-PATH_VALID_SEQS = "./../../data/sepsis/processed_long_term/sepsis.seqs.validation"
-PATH_VALID_LABELS = "./../../data/sepsis/processed_long_term/sepsis.labels.validation"
-PATH_TEST_SEQS = "./../../data/sepsis/processed_long_term/sepsis.seqs.test"
-PATH_TEST_LABELS = "./../../data/sepsis/processed_long_term/sepsis.labels.test"
-PATH_OUTPUT = "./../../out/result/"
+PATH_TRAIN_SEQS = "./../../data/sepsis/processed_data/sepsis.seqs.train"
+PATH_TRAIN_LABELS = "./../../data/sepsis/processed_data/sepsis.labels.train"
+PATH_VALID_SEQS = "./../../data/sepsis/processed_data/sepsis.seqs.validation"
+PATH_VALID_LABELS = "./../../data/sepsis/processed_data/sepsis.labels.validation"
+PATH_TEST_SEQS = "./../../data/sepsis/processed_data/sepsis.seqs.test"
+PATH_TEST_LABELS = "./../../data/sepsis/processed_data/sepsis.labels.test"
+PATH_OUTPUT = "./../../out/best_model/"
 os.makedirs(PATH_OUTPUT, exist_ok=True)
 
 NUM_EPOCHS = 20
-BATCH_SIZE = 32
+BATCH_SIZE = 64
 NUM_WORKERS = 0
 
 # Data loading
@@ -41,8 +41,18 @@ train_dataset = VisitSequenceWithLabelDataset(train_seqs, train_labels)
 valid_dataset = VisitSequenceWithLabelDataset(valid_seqs, valid_labels)
 test_dataset = VisitSequenceWithLabelDataset(test_seqs, test_labels)
 
-train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=time_collate_fn,
-                          num_workers=NUM_WORKERS)
+count_positive = 0
+count_negative = 0
+for data, label in train_dataset:
+    if label == 1:
+        count_positive += 1
+    else:
+        count_negative += 1
+
+weights = [count_negative if label == 1 else count_positive for data, label in train_dataset]
+sampler = WeightedRandomSampler(weights, num_samples=len(train_dataset), replacement=True)
+train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, collate_fn=time_collate_fn, sampler=sampler, num_workers=NUM_WORKERS)
+
 valid_loader = DataLoader(dataset=valid_dataset, batch_size=BATCH_SIZE, shuffle=False, collate_fn=time_collate_fn,
                           num_workers=NUM_WORKERS)
 
@@ -58,17 +68,9 @@ model.to(device)
 criterion.to(device)
 
 best_val_acc = 0.0
-train_losses, train_accuracies = [], []
-valid_losses, valid_accuracies = [], []
 for epoch in range(NUM_EPOCHS):
     train_loss, train_accuracy = train(model, device, train_loader, criterion, optimizer, epoch)
     valid_loss, valid_accuracy, valid_results = evaluate(model, device, valid_loader, criterion)
-
-    train_losses.append(train_loss)
-    valid_losses.append(valid_loss)
-
-    train_accuracies.append(train_accuracy)
-    valid_accuracies.append(valid_accuracy)
 
     is_best = valid_accuracy > best_val_acc  # let's keep the model that has the best accuracy, but you can also use another metric.
     if is_best:
@@ -77,32 +79,11 @@ for epoch in range(NUM_EPOCHS):
 
 best_model = torch.load(os.path.join(PATH_OUTPUT, "MyLSTM.pth"))
 
+print("\nEvaluation metrics on train set: \t")
+best_evaluate(best_model, device, train_loader)
 
-plot_learning_curves(train_losses, valid_losses, train_accuracies, valid_accuracies)
-valid_loss, valid_accuracy, valid_results = evaluate(best_model, device, valid_loader, criterion)
+print("\nEvaluation metrics on validation set: \t")
+best_evaluate(best_model, device, valid_loader)
 
-class_names = ['NO', 'YES']
-plot_confusion_matrix(valid_results, class_names)
-
-
-def predict_sepsis(model, device, data_loader):
-    probas = []
-    model.eval()
-    with torch.no_grad():
-        for i, (input, target) in enumerate(data_loader):
-
-            if isinstance(input, tuple):
-                input = tuple([e.to(device) if type(e) == torch.Tensor else e for e in input])
-            else:
-                input = input.to(device)
-
-            output = torch.softmax(model(input), 1)
-
-            y_pred = output.detach().to('cpu').select(1, 1).numpy().tolist()
-
-            probas.extend(y_pred)
-
-    return probas
-
-
-test_prob = predict_sepsis(best_model, device, test_loader)
+print("\nEvaluation metrics on test set: \t")
+best_evaluate(best_model, device, test_loader)
