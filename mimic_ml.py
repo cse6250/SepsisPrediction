@@ -19,6 +19,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix, roc_auc_score
 from sklearn.metrics import precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import matthews_corrcoef
 import matplotlib.pyplot as plt
 
 def plot_confusion_matrix(y_true, y_pred, normalize):
@@ -81,7 +82,7 @@ def MLtraining(X_train, X_test, y_train, y_test):
 ]
     
     
-    print("Clf Name, Score, Auc, CM:")
+    print("Clf Name, precision, recall, f1, mcc, auc:")
     result = []
     for name, clf in zip(names, classifiers):
     #    clf.fit(X_train, y_train)
@@ -92,11 +93,11 @@ def MLtraining(X_train, X_test, y_train, y_test):
         precision = precision_score(y_test, y_pred)
         recall = precision_score(y_test, y_pred)
         f1 = f1_score(y_test, y_pred)
-        score = clf.score(X_test, y_test)       
+        #score = clf.score(X_test, y_test)       
         auc = roc_auc_score(y_test, y_pred)
-        
-        result.append([precision, recall, f1, score, auc])
-        print(name, precision, recall, f1, score, auc) 
+        mcc = matthews_corrcoef(y_test, y_pred)
+        result.append([precision, recall, f1, mcc, auc])
+        print(name, precision, recall, f1, mcc, auc) 
     return np.array(result)
 #len(np.where(label==1)[0])
 
@@ -107,7 +108,7 @@ def MLtraining(X_train, X_test, y_train, y_test):
 
 #============part 1: take the mean, and then give a label for this patient=======
 #---take the last three/four hours label as the prediction goal
-def get_data_mean(data):
+def get_data_mean(data, prediction_window):
     group = data.groupby(data['icustay_id'])
     mean_data = group.mean()
     patients_num = len(mean_data)
@@ -138,7 +139,7 @@ def get_data_window(data):
     mean_data = group.mean()
     patients_num = len(mean_data)
     new_data_list = list(group)
-    prediction_window = 3
+    prediction_window = 2
     
     X = []
     Y = []
@@ -157,15 +158,6 @@ def get_data_window(data):
     Y = np.array(Y)  
     print('load data finish!')
     return X,Y
-
-#data = pd.read_csv('cleaned_pivoted_vital.csv') 
-data = pd.read_csv('sample_cleaned_pivoted_vital.csv')
-feature_name = data.columns.values.tolist()
-
-X,Y = get_data_mean(data)
-#X,Y = get_data_window(data)
-X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.5, random_state=42)
-#result = MLtraining(X_train, X_test, y_train, y_test)
 
 def feature_importance(allX, allY, feature_name):
     feature_name = np.array(feature_name)
@@ -208,5 +200,20 @@ def feature_importance(allX, allY, feature_name):
     plt.xlim([-1, allX.shape[1]])
     plt.show()
     return indices, importances
-     
-indices, importances = feature_importance(X, Y, feature_name)
+
+
+#-------------------------------main-----------------------------------     
+#data = pd.read_csv('small_cleaned_pivoted_vital.csv') 
+traindata = pd.read_csv('data/sepsis/train_cleaned_pivoted_vital.csv')
+testdata = pd.read_csv('data/sepsis/test_cleaned_pivoted_vital.csv')
+prediction_window = 6
+
+feature_name = traindata.columns.values.tolist()
+
+#X,Y = get_data_mean(data)
+#X,Y = get_data_window(data)
+X_train, y_train = get_data_mean(traindata, prediction_window)
+X_test, y_test = get_data_mean(testdata, prediction_window)
+#X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.5, random_state=42)
+result = MLtraining(X_train, X_test, y_train, y_test)
+#indices, importances = feature_importance(X, Y, feature_name)
