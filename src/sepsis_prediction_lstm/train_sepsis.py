@@ -19,7 +19,7 @@ PATH_VALID_SEQS = "./../../data/sepsis/processed_data/sepsis.seqs.validation"
 PATH_VALID_LABELS = "./../../data/sepsis/processed_data/sepsis.labels.validation"
 PATH_TEST_SEQS = "./../../data/sepsis/processed_data/sepsis.seqs.test"
 PATH_TEST_LABELS = "./../../data/sepsis/processed_data/sepsis.labels.test"
-PATH_OUTPUT = "./../../out/result/"
+PATH_OUTPUT = "./../../out/best_model/"
 os.makedirs(PATH_OUTPUT, exist_ok=True)
 
 NUM_EPOCHS = 20
