@@ -2,7 +2,7 @@
 This is the final project of the CSE6250. We mainly use the MIMIC-III data to predict the sepsis.
 
 ## ML model:
-Please put the data at the same level with data/
+Please put the code named mimic_ml.py at the same level with data/
 
 Currently, the arguments are fixed as:
 traindata = pd.read_csv('data/sepsis/train_cleaned_pivoted_vital.csv')
