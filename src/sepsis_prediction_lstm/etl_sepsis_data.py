@@ -7,9 +7,9 @@ from datetime import timedelta
 PATH_TRAIN = "./../../data/sepsis/train/train_sample_cleaned_pivoted_vital.csv"
 PATH_VALIDATION = "./../../data/sepsis/validation/valid_sample_cleaned_pivoted_vital.csv"
 PATH_TEST = "./../../data/sepsis/test/test_sample_cleaned_pivoted_vital.csv"
-PATH_OUTPUT = "./../../data/sepsis/processed_long_term/"
+PATH_OUTPUT = "./../../data/sepsis/processed_data/"
 
-def create_dataset(path, observation_window=12, prediction_window=3):
+def create_dataset(path, observation_window=12, prediction_window=6):
     """
     :param path: path to the directory contains raw files.
     :param observation window: time interval we will use to identify relavant events
@@ -18,8 +18,6 @@ def create_dataset(path, observation_window=12, prediction_window=3):
     """
     seqs = []
     labels = []
-    count_sepsis = 0
-    count_sepsis_with_six = 0
     # load data from csv;
     df = pd.read_csv(path)
 
@@ -43,16 +41,10 @@ def create_dataset(path, observation_window=12, prediction_window=3):
         for i in range(0, data.shape[0], 1):
             record_seqs.append(data.iloc[i].tolist())
 
-        if group.iloc[-1, -1]:
-            count_sepsis += 1
-            if len(record_seqs) != 0:
-                count_sepsis_with_six += 1
-
         if len(record_seqs) != 0:
             seqs.append(record_seqs)
             labels.append(group.iloc[-1, -1])
-    
-    print(count_sepsis, count_sepsis_with_six)
+
     return seqs, labels
 
 

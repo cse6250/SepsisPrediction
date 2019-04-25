@@ -2,6 +2,7 @@ import os
 import time
 import numpy as np
 import torch
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, matthews_corrcoef
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -118,3 +119,30 @@ def evaluate(model, device, data_loader, criterion, print_freq=10):
                     i, len(data_loader), batch_time=batch_time, loss=losses, acc=accuracy))
 
     return losses.avg, accuracy.avg, results
+
+def best_evaluate(model, device, data_loader):
+    y_true = []
+    y_pred = []
+    y_prob = []
+    model.eval()
+    with torch.no_grad():
+        for i, (input, target) in enumerate(data_loader):
+
+            if isinstance(input, tuple):
+                input = tuple([e.to(device) if type(e) == torch.Tensor else e for e in input])
+            else:
+                input = input.to(device)
+
+            output = model(input)
+            output_score = torch.softmax(model(input), 1)
+
+            y_true.extend(target.detach().to('cpu').numpy().tolist())
+            y_pred.extend(output.detach().to('cpu').max(1)[1].numpy().tolist())
+            y_prob.extend(output_score.detach().to('cpu').select(1, 1).numpy().tolist())
+
+    print('Test Accuracy: ' + str(accuracy_score(y_true, y_pred)) + '\t')
+    print('Test Precision: ' + str(precision_score(y_true, y_pred)) + '\t')
+    print('Test Recall: ' + str(recall_score(y_true, y_pred)) + '\t')
+    print('Test F1-score: ' + str(f1_score(y_true, y_pred)) + '\t')
+    print('Test ROC-AUC: ' + str(roc_auc_score(y_true, y_prob)) + '\t')
+    print('Test MCC: ' + str(matthews_corrcoef(y_true, y_pred)) + '\t')

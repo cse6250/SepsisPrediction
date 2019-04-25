@@ -6,15 +6,13 @@ class MyLSTM(nn.Module):
     def __init__(self, dim_input):
         super(MyLSTM, self).__init__()
         self.embedding = nn.Linear(in_features=dim_input, out_features=8)
-        nn.init.xavier_normal_(self.embedding.weight)
-        self.rnn = nn.LSTM(input_size=8, hidden_size=4, num_layers=2, batch_first=True, dropout=0.5)
+        self.rnn = nn.LSTM(input_size=8, hidden_size=4, num_layers=2, batch_first=True)
         self.output = nn.Linear(in_features=4, out_features=2)
-        nn.init.xavier_normal_(self.output.weight)
     
     def forward(self, input_tuple):
         seqs, lengths = input_tuple
 
-        embedded = torch.tanh((self.embedding(seqs)))
+        embedded = (torch.tanh(self.embedding(seqs)))
 
         seqs_packed = pack_padded_sequence(embedded, lengths, batch_first=True)
 
