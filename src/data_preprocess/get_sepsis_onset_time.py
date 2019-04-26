@@ -4,7 +4,7 @@ import glob
 import pandas as pd
 
 def read_csv():
-    PATH = 'mimic/sofa_timeline'
+    PATH = '../../mimic/sofa_timeline'
 
     df = pd.concat([pd.read_csv(f, header=None, names=['icustay_id', 'hr', 'starttime', 'sofa']) for f in glob.glob(PATH + '/part-0000[0-9]')])
     sorted_df = df.sort_values(['icustay_id', 'hr'], ascending=True)
@@ -35,5 +35,4 @@ def write_csv(sepsis_onset_time):
 
 if __name__ == '__main__':
     onset_time = read_csv()
-    # print(onset_time)
     write_csv(onset_time)
