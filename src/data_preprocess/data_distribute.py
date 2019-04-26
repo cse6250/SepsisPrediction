@@ -12,7 +12,6 @@ for _, row in df.iterrows():
     else:
         nonsepsis.append(int(row['count']))
 
-print(Counter(sepsis))
 sepsis_bins = {
     '1': range(0, 2),
     '2': range(2, 3),
@@ -37,16 +36,25 @@ for count in sepsis:
             sepsis_collect[key] += 1
             break
 
-print(sepsis_collect)
-
 bins = {
-    '0-5': range(0, 5),
-    '5-10': range(5, 10),
-    '10-20': range(10, 20),
-    '20-40': range(20, 40),
-    '40-80': range(40, 80),
-    '80-150': range(80, 150),
-    '150-500': range(150, 500),
+    '0-4': range(0, 5),
+    '5-9': range(5, 10),
+    '10-14': range(10, 15),
+    '15-19': range(15, 20),
+    '20-24': range(20, 40),
+    '25-29': range(25, 30),
+    '30-34': range(30, 35),
+    '35-39': range(35, 40),
+    '40-44': range(40, 45),
+    '45-49': range(45, 50),
+    '50-54': range(50, 55),
+    '55-59': range(55, 60),
+    '60-64': range(60, 65),
+    '65-69': range(65, 70),
+    '70-79': range(70, 80),
+    '80-99': range(80, 100),
+    '100-199': range(100, 200),
+    '200-499': range(200, 500),
     '500+': range(500, 4000)
 }
 
