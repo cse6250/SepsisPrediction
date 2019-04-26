@@ -1,6 +1,5 @@
 .*
 !/.gitignore
-pivoted_sofa.csv
 training/
 **/spark-warehouse
 bigdata/target/
@@ -9,4 +8,5 @@ bigdata/project/*
 !bigdata/project/plugins.sbt
 mimic/target/
 mimic/project/*
-data/sepsis
+data/mimic/*
+data/sepsis/*
