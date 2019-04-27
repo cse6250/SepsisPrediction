@@ -21,6 +21,7 @@ def feature_importance(X, y):
     X = np.array(X)
 
     fig = plt.figure(figsize=(15,6))
+    plt.title('Feature importance')
     plt.bar(range(X.shape[1]), importances[indices],
            color="y", yerr=std[indices], align="center", width = 0.6)
     plt.xticks(range(X.shape[1]), feature_name[indices]) 

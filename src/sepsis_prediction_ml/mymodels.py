@@ -19,7 +19,7 @@ def select_model(X, y):
 
     param_tests = [
         {
-            'max_depth': range(1, 11, 1),
+            'max_depth': range(1, 11, 1)
         },
         {
             'n_estimators': range(10, 210, 10),
