@@ -8,5 +8,3 @@ bigdata/project/*
 !bigdata/project/plugins.sbt
 mimic/target/
 mimic/project/*
-data/mimic/*
-data/sepsis/*
