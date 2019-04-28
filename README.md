@@ -47,3 +47,6 @@ After data preprocess, the processed data are in the './data/sepsis/train', './d
 1. Run ```etl_sepsis_data.py``` in './src/etl_data' to construct the features sequence data for prediction models
 2. Run ```train_sepsis.py``` in './src/sepsis\_prediction\_ml' to run the 4 machine learning models
 3. Run ```train_sepsis.py``` in './src/sepsis\_prediction\_lstm' to run the deep learning models
+
+### Presentation
+You can see the presentation of our project on the youtube: [https://www.youtube.com/watch?v=BZk-XtCBGZM](https://www.youtube.com/watch?v=BZk-XtCBGZM)

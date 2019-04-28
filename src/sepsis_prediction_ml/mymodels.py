@@ -61,7 +61,7 @@ def evaluate(X_train, X_test, y_train, y_test):
         
         accuracy = accuracy_score(y_test, y_pred)
         precision = precision_score(y_test, y_pred)
-        recall = precision_score(y_test, y_pred)
+        recall = recall_score(y_test, y_pred)
         f1 = f1_score(y_test, y_pred)  
         roc_auc = roc_auc_score(y_test, y_prob)
         mcc = matthews_corrcoef(y_test, y_pred)
